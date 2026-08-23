@@ -28,15 +28,15 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
     header {
       text-align: center;
-      padding: 20px 0 30px 0;
+      padding: 20px 0;
       border-bottom: 1px solid var(--border-color);
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     header h1 {
@@ -49,6 +49,38 @@
       color: var(--text-muted);
       font-size: 0.9rem;
       margin-top: 5px;
+    }
+
+    /* 頁籤導覽 (Tabs) */
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--accent-gold);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-gold);
+      color: #000;
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
     }
 
     /* 驗證遮罩 Modal */
@@ -270,6 +302,76 @@
       font-size: 1.1rem;
     }
 
+    /* --- 📜 歐式羊皮紙復古風大表樣式 --- */
+    .parchment-card {
+      background: #d1bc96;
+      background-image: 
+        radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, #e4d3b0, #c3ae85);
+      background-size: 20px 20px, 100% 100%;
+      color: #2b1e10;
+      border: 10px double #5c4028;
+      border-radius: 4px;
+      padding: 30px 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 0 50px rgba(92, 64, 40, 0.3);
+      margin-bottom: 25px;
+      overflow-x: auto;
+    }
+
+    .parchment-header {
+      text-align: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #5c4028;
+      padding-bottom: 15px;
+    }
+
+    .parchment-header h2 {
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 1.8rem;
+      color: #3d2314;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.4);
+    }
+
+    .vintage-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 0.95rem;
+    }
+
+    .vintage-table th {
+      background: rgba(92, 64, 40, 0.15);
+      color: #2b1e10;
+      border: 1px solid #5c4028;
+      padding: 12px 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .vintage-table td {
+      border: 1px solid #7c5c3e;
+      padding: 10px 8px;
+      text-align: center;
+      color: #1a1007;
+      vertical-align: middle;
+    }
+
+    .vintage-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .tag-full-v {
+      color: #15803d;
+      font-weight: bold;
+    }
+
+    .tag-open-v {
+      color: #b45309;
+      font-weight: bold;
+    }
+
     footer {
       text-align: center;
       margin-top: 40px;
@@ -300,12 +402,10 @@
       <p>即時同步 Google 試算表最新班表與鎖角狀況</p>
     </header>
 
-    <!-- 場次選擇區 -->
-    <div class="selector-card">
-      <label for="sessionSelect">📅 請選擇場次 (datetime)：</label>
-      <select id="sessionSelect" onchange="renderSessionData()">
-        <option value="">載入中...</option>
-      </select>
+    <!-- 分頁切換按鈕 -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('single')">📌 單場詳細資訊</button>
+      <button class="tab-btn" onclick="switchTab('overview')">📜 全場次總表 (歐式大表)</button>
     </div>
 
     <div id="loading">⏳ 正在從 Google 試算表同步資料...</div>
@@ -313,82 +413,115 @@
     <!-- 主要內容展示區 -->
     <div id="contentDisplay" style="display: none;">
       
-      <!-- 網格第一排：缺額狀況 & 今日 NPC -->
-      <div class="grid">
-        
-        <!-- 玩家人數與缺額卡片 -->
-        <div class="card">
-          <div class="card-title">
-            <span>👥 玩家人數與缺額</span>
-            <span id="statusBadge" class="status-badge"></span>
+      <!-- ===== 分頁一：單場詳細 ===== -->
+      <div id="tabSingle">
+        <!-- 場次選擇區 -->
+        <div class="selector-card">
+          <label for="sessionSelect">📅 請選擇場次 (datetime)：</label>
+          <select id="sessionSelect" onchange="renderSessionData()">
+            <option value="">載入中...</option>
+          </select>
+        </div>
+
+        <!-- 網格第一排：缺額狀況 & 今日 NPC -->
+        <div class="grid">
+          <!-- 玩家人數與缺額卡片 -->
+          <div class="card">
+            <div class="card-title">
+              <span>👥 玩家人數與缺額</span>
+              <span id="statusBadge" class="status-badge"></span>
+            </div>
+
+            <div class="stat-row">
+              <span>已報名女生 (G)：</span>
+              <span class="stat-val val-female" id="valG">0</span>
+            </div>
+            <div class="stat-row">
+              <span>已報名男生 (B)：</span>
+              <span class="stat-val val-male" id="valB">0</span>
+            </div>
+            <div style="height: 1px; background: var(--border-color); margin: 10px 0;"></div>
+            <div class="stat-row">
+              <span>尚缺女生 (need_G)：</span>
+              <span class="stat-val val-female" id="valNeedG">0</span>
+            </div>
+            <div class="stat-row">
+              <span>尚缺男生 (need_B)：</span>
+              <span class="stat-val val-male" id="valNeedB">0</span>
+            </div>
           </div>
 
-          <div class="stat-row">
-            <span>已報名女生 (G)：</span>
-            <span class="stat-val val-female" id="valG">0</span>
-          </div>
-          <div class="stat-row">
-            <span>已報名男生 (B)：</span>
-            <span class="stat-val val-male" id="valB">0</span>
-          </div>
-          <div style="height: 1px; background: var(--border-color); margin: 10px 0;"></div>
-          <div class="stat-row">
-            <span>尚缺女生 (need_G)：</span>
-            <span class="stat-val val-female" id="valNeedG">0</span>
-          </div>
-          <div class="stat-row">
-            <span>尚缺男生 (need_B)：</span>
-            <span class="stat-val val-male" id="valNeedB">0</span>
+          <!-- 今日 NPC 班表 -->
+          <div class="card">
+            <div class="card-title">
+              <span>🎭 今日值班 NPC</span>
+            </div>
+            <div class="npc-grid">
+              <div class="npc-item">
+                <div class="npc-role">老闆 (boss)</div>
+                <div class="npc-name" id="npcBoss">-</div>
+              </div>
+              <div class="npc-item">
+                <div class="npc-role">歌姬 (singer)</div>
+                <div class="npc-name" id="npcSinger">-</div>
+              </div>
+              <div class="npc-item">
+                <div class="npc-role">清潔員 (cleaner)</div>
+                <div class="npc-name" id="npcCleaner">-</div>
+              </div>
+              <div class="npc-item">
+                <div class="npc-role">侍從 (Attendant)</div>
+                <div class="npc-name" id="npcAttendant">-</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- 今日 NPC 班表 -->
-        <div class="card">
-          <div class="card-title">
-            <span>🎭 今日值班 NPC</span>
+        <!-- 網格第二排：鎖角與玩家詳細名單 -->
+        <div class="grid">
+          <div class="card">
+            <div class="card-title">🔐 鎖角狀況 (lock_role)</div>
+            <div class="list-box" id="valLockRole">無鎖角紀錄</div>
           </div>
-          <div class="npc-grid">
-            <div class="npc-item">
-              <div class="npc-role">老闆 (boss)</div>
-              <div class="npc-name" id="npcBoss">-</div>
+
+          <div class="card">
+            <div class="card-title">玩家詳細名單</div>
+            <div style="margin-bottom: 8px;">
+              <strong class="val-female" style="font-size: 0.85rem;">女生名單 (G_player)：</strong>
+              <div class="list-box" id="valGPlayer">-</div>
             </div>
-            <div class="npc-item">
-              <div class="npc-role">歌姬 (singer)</div>
-              <div class="npc-name" id="npcSinger">-</div>
-            </div>
-            <div class="npc-item">
-              <div class="npc-role">清潔員 (cleaner)</div>
-              <div class="npc-name" id="npcCleaner">-</div>
-            </div>
-            <div class="npc-item">
-              <div class="npc-role">侍從 (Attendant)</div>
-              <div class="npc-name" id="npcAttendant">-</div>
+            <div>
+              <strong class="val-male" style="font-size: 0.85rem;">男生名單 (B_player)：</strong>
+              <div class="list-box" id="valBPlayer">-</div>
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- 網格第二排：鎖角與玩家詳細名單 -->
-      <div class="grid">
-        
-        <div class="card">
-          <div class="card-title">🔐 鎖角狀況 (lock_role)</div>
-          <div class="list-box" id="valLockRole">無鎖角紀錄</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">玩家詳細名單</div>
-          <div style="margin-bottom: 8px;">
-            <strong class="val-female" style="font-size: 0.85rem;">女生名單 (G_player)：</strong>
-            <div class="list-box" id="valGPlayer">-</div>
+      <!-- ===== 分頁二：歐式羊皮紙總表 ===== -->
+      <div id="tabOverview" style="display: none;">
+        <div class="parchment-card">
+          <div class="parchment-header">
+            <h2>⚜️ 英倫旅店 出演與揪團總表 ⚜️</h2>
           </div>
-          <div>
-            <strong class="val-male" style="font-size: 0.85rem;">男生名單 (B_player)：</strong>
-            <div class="list-box" id="valBPlayer">-</div>
-          </div>
+          <table class="vintage-table">
+            <thead>
+              <tr>
+                <th>場次 / 時段</th>
+                <th>玩家名單 (女/男)</th>
+                <th>缺額狀態</th>
+                <th>老闆</th>
+                <th>歌姬</th>
+                <th>清潔員</th>
+                <th>侍從</th>
+                <th>鎖角</th>
+              </tr>
+            </thead>
+            <tbody id="overviewTableBody">
+              <!-- 動態生成表格欄位 -->
+            </tbody>
+          </table>
         </div>
-
       </div>
 
       <button class="refresh-btn" onclick="fetchSheetData()">🔄 手動重新整理資料</button>
@@ -401,34 +534,50 @@
   </div>
 
   <script>
-    // ⚠️ 請記得在此處替換為你的 Google 試算表 CSV 發布網址
+    // CSV 發布網址
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTJthiZigyaWodBnUgeoc6hDUMcQWYzoXSX5W2UUDBfcz6kDXSIgKW8igsPMHbaFenbo5NxxfNIlFR_/pub?gid=0&single=true&output=csv';
 
-    
-    const _c = "FAURTgYF";
-    const _k = "erty1238fhkjsn";
+    // 🔒 原本的加解密邏輯
+    const TARGET_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
-    // XOR 解混淆解密函式
-    function _d(s, k) {
-      let b = atob(s), r = '';
-      for (let i = 0; i < b.length; i++) {
-        r += String.fromCharCode(b.charCodeAt(i) ^ k.charCodeAt(i % k.length));
-      }
-      return r;
+    async function hashPass(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // 驗證密碼
-    function verifyAuth() {
+    async function verifyAuth() {
       const input = document.getElementById('passInput').value;
-      const realPass = _d(_c, _k);
+      const hashed = await hashPass(input);
 
-      if (input === realPass) {
+      if (hashed === TARGET_HASH) {
         document.getElementById('authOverlay').style.display = 'none';
         document.getElementById('mainContainer').style.display = 'block';
         sessionStorage.setItem('isAuthed', 'true');
         fetchSheetData();
       } else {
         document.getElementById('authError').style.display = 'block';
+      }
+    }
+
+    // 分頁切換函式
+    function switchTab(tabName) {
+      const btns = document.querySelectorAll('.tab-btn');
+      const tabSingle = document.getElementById('tabSingle');
+      const tabOverview = document.getElementById('tabOverview');
+
+      if (tabName === 'single') {
+        btns[0].classList.add('active');
+        btns[1].classList.remove('active');
+        tabSingle.style.display = 'block';
+        tabOverview.style.display = 'none';
+      } else {
+        btns[0].classList.remove('active');
+        btns[1].classList.add('active');
+        tabSingle.style.display = 'none';
+        tabOverview.style.display = 'block';
       }
     }
 
@@ -473,6 +622,7 @@
             document.getElementById('contentDisplay').style.display = 'block';
 
             renderSessionData();
+            renderOverviewTable(); // 渲染歐式大表
           }
         });
       };
@@ -495,6 +645,7 @@
       }
     }
 
+    // 渲染單場資料
     function renderSessionData() {
       const select = document.getElementById('sessionSelect');
       const index = select.value;
@@ -527,6 +678,44 @@
       document.getElementById('valLockRole').textContent = data.lock_role || '無';
       document.getElementById('valGPlayer').textContent = data.G_player || '無';
       document.getElementById('valBPlayer').textContent = data.B_player || '無';
+    }
+
+    // 渲染歐式大表
+    function renderOverviewTable() {
+      const tbody = document.getElementById('overviewTableBody');
+      tbody.innerHTML = '';
+
+      globalData.forEach(item => {
+        const tr = document.createElement('tr');
+
+        const needG = parseInt(item.need_G || 0);
+        const needB = parseInt(item.need_B || 0);
+        
+        let statusHtml = '';
+        if (needG === 0 && needB === 0) {
+          statusHtml = `<span class="tag-full-v">已滿團</span>`;
+        } else {
+          statusHtml = `<span class="tag-open-v">缺 ${needG}女 ${needB}男</span>`;
+        }
+
+        const gPlayers = item.G_player ? `女: ${item.G_player}` : '女: -';
+        const bPlayers = item.B_player ? `男: ${item.B_player}` : '男: -';
+
+        tr.innerHTML = `
+          <td style="font-weight: bold;">${item.datetime}</td>
+          <td style="font-size: 0.85rem; text-align: left;">
+            <div style="color: #831843;">${gPlayers}</div>
+            <div style="color: #1e3a8a;">${bPlayers}</div>
+          </td>
+          <td>${statusHtml}</td>
+          <td>${item.boss || '-'}</td>
+          <td>${item.singer || '-'}</td>
+          <td>${item.cleaner || '-'}</td>
+          <td>${item.Attendant || '-'}</td>
+          <td style="font-size: 0.85rem; color: #701a75;">${item.lock_role || '無'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     // 檢查本次分頁瀏覽是否已登入過
